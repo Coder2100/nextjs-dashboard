@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  next-app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      # 1. This syncs your VS Code workspace with the container
+      - .:/app
+      # 2. Anonymous volume to protect container-installed node_modules
+      - /app/node_modules
+      # 3. Anonymous volume to protect Next.js build cache
+      - /app/.next
+    environment:
+      # Fixes sync lag/bugs on Windows and macOS
+      - WATCHPACK_POLLING=true 

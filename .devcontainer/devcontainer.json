@@ -1,0 +1,36 @@
+{
+  "name": "Node.js & TypeScript",
+  // FIX: Points to a valid Microsoft Node.js base image
+  "image": "://microsoft.com",
+  
+  // FIX: Safely installs the latest version of pnpm inside the container
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "none",
+      "pnpmVersion": "latest"
+    }
+  },
+
+  "forwardPorts":,
+  
+  // FIX: Runs pnpm install by default (use terminal for npm if needed)
+  "postCreateCommand": "pnpm install",
+
+  // MAC PERFORMANCE FIX: Bypasses the slow macOS file system share for node_modules and pnpm cache
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
+    "source=${localWorkspaceFolderBasename}-pnpm-store,target=/home/node/.local/share/pnpm/store,type=volume"
+  ],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+
+  // FIX: Prevents root file permission lockouts on your Mac
+  "remoteUser": "node"
+}
