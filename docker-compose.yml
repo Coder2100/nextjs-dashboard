@@ -1,17 +1,36 @@
 version: '3.8'
 
 services:
-  next-app:
-    build: .
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      # 1. This syncs your VS Code workspace with the container
-      - .:/app
-      # 2. Anonymous volume to protect container-installed node_modules
-      - /app/node_modules
-      # 3. Anonymous volume to protect Next.js build cache
-      - /app/.next
+      - .:/app           # Mounts your local project folder into the container
+      - /app/node_modules # Prevents local node_modules from overwriting the container's modules
+      - /app/.next       # Prevents local build cache from overwriting container cache
     environment:
-      # Fixes sync lag/bugs on Windows and macOS
-      - WATCHPACK_POLLING=true 
+      - WATCHPACK_POLLING=true # CRITICAL: Forces Next.js to watch for Docker file changes
+      - NODE_ENV=development
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_panel
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    depends_on:
+      - postgres
