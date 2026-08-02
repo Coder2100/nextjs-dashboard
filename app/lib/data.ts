@@ -9,7 +9,12 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+//const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const allowSsl = process.env.POSTGRES_SSL === 'true';
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: allowSsl ? { rejectUnauthorized: false } : false });
+
+const invoiceCountPromise = sql`SELECT COUNT(*) FROM invoices`;
+const customerCountPromise = sql`SELECT COUNT(*) FROM customers`;
 
 export async function fetchRevenue() {
   try {
@@ -30,6 +35,7 @@ export async function fetchRevenue() {
   }
 }
 
+// Fetch the last 5 invoices, sorted by date
 export async function fetchLatestInvoices() {
   try {
     const data = await sql<LatestInvoiceRaw[]>`
@@ -61,7 +67,7 @@ export async function fetchCardData() {
          SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END) AS "paid",
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
-
+//parallel execution of the above queries
     const data = await Promise.all([
       invoiceCountPromise,
       customerCountPromise,

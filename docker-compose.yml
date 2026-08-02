@@ -1,19 +1,6 @@
 version: '3.8'
 
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    volumes:
-      - .:/app           # Mounts your local project folder into the container
-      - /app/node_modules # Prevents local node_modules from overwriting the container's modules
-      - /app/.next       # Prevents local build cache from overwriting container cache
-    environment:
-      - WATCHPACK_POLLING=true # CRITICAL: Forces Next.js to watch for Docker file changes
-      - NODE_ENV=development
   postgres:
     image: postgres:latest
     container_name: postgres_db
