@@ -1,10 +1,25 @@
-export default function Page() {
+import { fetchFilteredCustomers } from '@/app/lib/data';
+import CustomersTable from '@/app/ui/customers/table';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Customers',
+};
+
+export default async function Page(props: {
+  searchParams?: Promise<{
+    query?: string;
+    page?: string;
+  }>;
+}) {
+  const searchParams = await props.searchParams;
+  const query = searchParams?.query || '';
+
+  const customers = await fetchFilteredCustomers(query);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-4xl font-bold">Customers</h1>
-      <p className="mt-4 text-lg text-gray-600">
-        Here you can manage your customers and view their information.
-      </p>
-    </div>
+    <main>
+      <CustomersTable customers={customers} />
+    </main>
   );
 }
